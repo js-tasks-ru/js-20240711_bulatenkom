@@ -5,5 +5,15 @@
  * @returns {string[]}
  */
 export function sortStrings(arr, param = 'asc') {
+    const copy = [...arr];
 
+    switch (param) {
+        case 'asc': copy.sort((a, b) => a.localeCompare(b, ['ru', 'en'], { caseFirst: "upper" }));
+            break;
+        case 'desc': copy.sort((a, b) => b.localeCompare(a, ['ru', 'en'], { caseFirst: "upper" }));
+            break;
+        default:
+            throw new Error(`Unsupported param ordering (got = '${param}', wanted = 'asc'/'desc')`);
+    }
+    return copy;
 }
