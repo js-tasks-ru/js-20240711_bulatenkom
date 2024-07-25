@@ -90,13 +90,13 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
   });
 
   it('should have ability to be updated by new "data" values (should re-render only body with charts columns)', () => {
-    const data = [10];
+    const data = [10, 20];
 
     columnChart = new ColumnChart({ data });
 
     const chart = columnChart.element.querySelector('.column-chart__chart');
 
-    const newData = [20];
+    const newData = [20, 5];
     const columnProps = getColumnProps(newData);
 
     columnChart.update(newData);
