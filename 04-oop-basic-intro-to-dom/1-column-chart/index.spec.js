@@ -41,9 +41,9 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
 
     document.body.append(columnChart.element);
 
-    const columnLink = columnChart.element.querySelector('.column-chart__link');
+    const elemLink = columnChart.element.querySelector('.column-chart__link');
 
-    expect(columnLink).toBeVisible();
+    expect(elemLink).toBeVisible();
   });
 
   it('should have property "chartHeight"', () => {
@@ -55,9 +55,9 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
   it('should have ability to define total value', () => {
     const value = 200;
     columnChart = new ColumnChart({ value });
-    const columnLink = columnChart.element.querySelector('.column-chart__header');
+    const elemHeader = columnChart.element.querySelector('.column-chart__header');
 
-    expect(columnLink).toHaveTextContent(value);
+    expect(elemHeader).toHaveTextContent(value);
   });
 
   it('should have ability to define "formatHeading" function', () => {
@@ -65,9 +65,9 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
     const value = 100;
 
     columnChart = new ColumnChart({ formatHeading, value });
-    const columnLink = columnChart.element.querySelector('.column-chart__header');
+    const elemHeader = columnChart.element.querySelector('.column-chart__header');
 
-    expect(columnLink).toHaveTextContent(formatHeading(value));
+    expect(elemHeader).toHaveTextContent(formatHeading(value));
   });
 
   it('should render data correctly', () => {
