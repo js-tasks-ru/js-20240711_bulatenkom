@@ -19,7 +19,7 @@ export default class ColumnChart {
     }
 
     createChartElement() {
-        let template = document.createElement('template');
+        const template = document.createElement('template');
         template.insertAdjacentHTML('afterbegin', `
         <div class="column-chart__container">
             ${this.createChartHeaderElement().outerHTML}
@@ -29,19 +29,19 @@ export default class ColumnChart {
     }
 
     createChartHeaderElement() {
-        let value = (this.formatHeading) ? this.formatHeading(this.value) : this.value;
+        const value = (this.formatHeading) ? this.formatHeading(this.value) : this.value;
 
-        let template = document.createElement('template');
+        const template = document.createElement('template');
         template.insertAdjacentHTML('afterbegin', `<div data-element="header" class="column-chart__header">${value}</div>`);
         return template.firstElementChild;        
     }
 
     createChartBodyElement() {
-        let template = document.createElement('template');
+        const template = document.createElement('template');
         template.insertAdjacentHTML('afterbegin', `<div data-element="body" class="column-chart__chart"></div>`);
-        let body = template.firstElementChild;
+        const body = template.firstElementChild;
         
-        let chartColumnsHtmlString = this.getColumnProps(this.data)
+        const chartColumnsHtmlString = this.getColumnProps(this.data)
             .map(({value, percent}) => `<div style="--value: ${value}" data-tooltip="${percent}"></div>`)
             .join('');
             
@@ -51,7 +51,7 @@ export default class ColumnChart {
     }
 
     createTitleElement() {
-        let template = document.createElement('template');
+        const template = document.createElement('template');
         template.insertAdjacentHTML('afterbegin', `<div class="column-chart__title">${this.label}</div>`);
         if (this.link) {
             template.firstElementChild.insertAdjacentHTML('beforeend', `<a href="${this.link}" class="column-chart__link">View all</a>`);
@@ -63,7 +63,7 @@ export default class ColumnChart {
         let customClasses = '';
         if (!this.data || this.data.length === 0) customClasses += 'column-chart_loading';
 
-        let template = document.createElement('template');
+        const template = document.createElement('template');
         template.insertAdjacentHTML('afterbegin', `<div class="column-chart ${customClasses}" style="--chart-height: 50"></div>`);
         return template.firstElementChild;
     }
@@ -90,10 +90,10 @@ export default class ColumnChart {
     }
 
     destroy() {
-        this.element = null;
+        this.remove();
     }
 
     remove() {
-        this.destroy();
+        this.element.remove();
     }
 }

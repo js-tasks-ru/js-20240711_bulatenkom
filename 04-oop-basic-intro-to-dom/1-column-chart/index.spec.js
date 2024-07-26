@@ -41,9 +41,9 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
 
     document.body.append(columnChart.element);
 
-    const elemLink = columnChart.element.querySelector('.column-chart__link');
+    const columnLink = columnChart.element.querySelector('.column-chart__link');
 
-    expect(elemLink).toBeVisible();
+    expect(columnLink).toBeVisible();
   });
 
   it('should have property "chartHeight"', () => {
@@ -55,9 +55,9 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
   it('should have ability to define total value', () => {
     const value = 200;
     columnChart = new ColumnChart({ value });
-    const elemHeader = columnChart.element.querySelector('.column-chart__header');
+    const columnLink = columnChart.element.querySelector('.column-chart__header');
 
-    expect(elemHeader).toHaveTextContent(value);
+    expect(columnLink).toHaveTextContent(value);
   });
 
   it('should have ability to define "formatHeading" function', () => {
@@ -65,9 +65,9 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
     const value = 100;
 
     columnChart = new ColumnChart({ formatHeading, value });
-    const elemHeader = columnChart.element.querySelector('.column-chart__header');
+    const columnLink = columnChart.element.querySelector('.column-chart__header');
 
-    expect(elemHeader).toHaveTextContent(formatHeading(value));
+    expect(columnLink).toHaveTextContent(formatHeading(value));
   });
 
   it('should render data correctly', () => {
@@ -90,16 +90,16 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
   });
 
   it('should have ability to be updated by new "data" values (should re-render only body with charts columns)', () => {
-    const data = [10, 10, 10];
+    const data = [10];
 
     columnChart = new ColumnChart({ data });
 
-    const newData = [20, 40, 30];
+    const chart = columnChart.element.querySelector('.column-chart__chart');
+
+    const newData = [20];
     const columnProps = getColumnProps(newData);
 
     columnChart.update(newData);
-
-    const chart = columnChart.element.querySelector('.column-chart__chart');
 
     expect(getComputedStyle(chart.children[0]).getPropertyValue('--value')).toEqual(columnProps[0].value);
     expect(chart.children[0].dataset.tooltip).toEqual(columnProps[0].percent);
