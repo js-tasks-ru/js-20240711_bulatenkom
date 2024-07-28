@@ -70,10 +70,10 @@ export default class ColumnChart {
 
     generateComponentAsHTML() {
         this.root = this.createRootElement();
-        this.title = this.createTitleElement();
+        const title = this.createTitleElement();
         this.chart = this.createChartElement();
 
-        this.root.append(this.title, this.chart);
+        this.root.append(title, this.chart);
         return this.root;
     }
 
