@@ -2,10 +2,14 @@ export default class SortableTable {
   element;
   subElements = [];
   #data;
+  #sorted = {};
 
   constructor(headerConfig = [], data = []) {
     this.headerConfig = headerConfig;
-    this.data = data;
+    this.#data = data;
+
+    this.element = this.createElement(this.createTemplate(this.headerConfig, this.data, this.sorted));
+    this.selectSubElements();
   }
 
   get data() {
@@ -14,8 +18,21 @@ export default class SortableTable {
 
   set data(value) {
     this.#data = value;
+    this.render();
+  }
 
-    this.element = this.createElement(this.createTemplate(this.headerConfig, this.data));
+  get sorted() {
+    return this.#sorted;
+  }
+
+  set sorted({ id, order }) {
+    this.#sorted = { id, order };
+    this.render();
+  }
+
+  render() {
+    this.subElements['header'].innerHTML = this.createHeaderColumnsTemplate(this.headerConfig, this.sorted);
+    this.subElements['body'].innerHTML = this.createBodyRowsTemplate(this.data);
     this.selectSubElements();
   }
   
@@ -25,37 +42,52 @@ export default class SortableTable {
     return element.firstElementChild;
   }
 
-  createTemplate(headerConfig, data) {
+  createTemplate(headerConfig, data, sorted) {
     return `
       <div class="sortable-table">
-        ${this.createHeaderTemplate(headerConfig)}
+        ${this.createHeaderTemplate(headerConfig, sorted)}
         ${this.createBodyTemplate(data)}
       </div>
     `;
   }
 
-  createHeaderTemplate(headerConfig) {
-    const columnsTemplate = headerConfig.map(item =>  `
-      <div class="sortable-table__cell" data-id=${item.id} data-sortable="${item.sortable}">
-        <span>${item.title}</span>
-      </div>
-    `).join('');
-
+  createHeaderTemplate(headerConfig, sorted) {
     return `
       <div data-element="header" class="sortable-table__header sortable-table__row">
-        ${columnsTemplate}
+        ${this.createHeaderColumnsTemplate(headerConfig, sorted)}
       </div>
     `;
   }
 
-  createBodyTemplate(data) {
-    const rows = data.map(item => this.createRowTemplate(item));
+  createHeaderColumnsTemplate(headerConfig, sorted) {
+    return headerConfig.map(item =>  `
+      <div class="sortable-table__cell" data-id=${item.id} data-sortable="${item.sortable}" data-order='${sorted.order ?? ''}'>
+        <span>${item.title}</span>
+        ${ (item.id === sorted.id) ? this.createArrowTemplate() : ''}
+      </div>
+    `).join('');
+  }
 
+  createArrowTemplate() {
+    return `
+      <span data-element="arrow" class="sortable-table__sort-arrow">
+        <span class="sort-arrow"></span>
+      </span>
+    `;
+  }
+
+  createBodyTemplate(data) {
     return `
       <div data-element="body" class="sortable-table__body">
-        ${rows.join('')}
+        ${this.createBodyRowsTemplate(data)}
       </div>
     `;
+  }
+
+  createBodyRowsTemplate(data) {
+    return data
+      .map(item => this.createRowTemplate(item))
+      .join('');
   }
 
   createRowTemplate(item) {
@@ -73,6 +105,7 @@ export default class SortableTable {
   sort(field, order) {
     const sortType = this.headerConfig.find(item => item.id === field).sortType;
     this.data = sort(this.data, (v) => v[field], sortType, order);
+    this.sorted = { id: field, order: order }
   }
 
   selectSubElements() {
