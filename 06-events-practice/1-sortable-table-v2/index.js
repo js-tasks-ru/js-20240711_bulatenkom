@@ -10,10 +10,10 @@ export default class SortableTable extends SortableTableV1 {
     super(headersConfig, data);
     this.sort(sorted.id, sorted.order);
 
-    this.addEventListener(this.subElements['header'], 'pointerdown', this.onHeaderClick);
+    this.addEventListener(this.subElements['header'], 'pointerdown', this.onHeaderPointerDown);
   }
 
-  onHeaderClick(event) {
+  onHeaderPointerDown(event) {
     const sortableElement = event.target.closest('[data-sortable=true]')
     if (sortableElement) {
       const order = sortableElement.dataset.order === 'asc' ? 'desc' : 'asc';
