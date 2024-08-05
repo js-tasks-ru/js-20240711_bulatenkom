@@ -38,8 +38,10 @@ class Tooltip {
   }
 
   onPointerMove(event) {
+    if (!this.element) return;
+
     this.element.style.left = 10 + event.clientX + 'px';
-    this.element.style.top = 10 + event.clientY + 'px';
+    this.element.style.top  = 10 + event.clientY + 'px';
   }
 
   render(text) {
