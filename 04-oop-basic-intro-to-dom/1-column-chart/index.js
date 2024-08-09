@@ -13,9 +13,12 @@ export default class ColumnChart {
 
     update(newData) {
         this.data = newData;
+        this.updateBodyElement();
+    }
 
-        this.chart.lastElementChild.remove();
-        this.chart.append(this.createChartBodyElement());
+    updateBodyElement() {
+        const body = this.chart.querySelector('[data-element=body]');
+        body.innerHTML = this.createChartBodyColumnsTemplate();
     }
 
     createChartElement() {
@@ -40,14 +43,16 @@ export default class ColumnChart {
         const template = document.createElement('template');
         template.insertAdjacentHTML('afterbegin', `<div data-element="body" class="column-chart__chart"></div>`);
         const body = template.firstElementChild;
-        
-        const chartColumnsHtmlString = this.getColumnProps(this.data)
-            .map(({value, percent}) => `<div style="--value: ${value}" data-tooltip="${percent}"></div>`)
-            .join('');
             
-        body.insertAdjacentHTML('afterbegin', chartColumnsHtmlString);
+        body.insertAdjacentHTML('afterbegin', this.createChartBodyColumnsTemplate());
 
         return body; 
+    }
+
+    createChartBodyColumnsTemplate() {
+        return this.getColumnProps(this.data)
+            .map(({value, percent}) => `<div style="--value: ${value}" data-tooltip="${percent}"></div>`)
+            .join('');
     }
 
     createTitleElement() {
