@@ -1,5 +1,6 @@
-import fetchJson from './utils/fetch-json.js';
 import {default as SortableTableV2} from '../../06-events-practice/1-sortable-table-v2/index.js';
+import throttle from './utils/throttle.js';
+import PageFetcher from './utils/page-fetcher.js';
 
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
@@ -22,11 +23,10 @@ export default class SortableTable extends SortableTableV2 {
     this.isSortLocally = isSortLocally;
     this.url = url;
     this.sorted = sorted;
-    this.pageFetcher = new SortableTable.PageFetcher(url, BACKEND_URL, 30, sorted);
+    this.pageFetcher = new PageFetcher(url, BACKEND_URL, 30, sorted);
 
-    this.addEventListener(document, 'scroll', this.onDocumentScroll);
-    this.element.addEventListener('created', this.onCreated.bind(this), { once: true });
-    this.element.dispatchEvent(new CustomEvent('created'));
+    this.addEventListener(document, 'scroll', throttle(this.onDocumentScroll.bind(this), 500));
+    this.render();
   }
 
   onDocumentScroll() {
@@ -35,18 +35,34 @@ export default class SortableTable extends SortableTableV2 {
     const total = bcr.height - clientHeight;
     const progress = scrollY;
     if (progress / total > 0.8 && this.pageFetcher.hasNext()) {
-      this.loadNextData();
+      this.render();
     }
   }
 
-  onCreated() {
-    this.loadNextData();
+  // actual rendering of table data and headers happens on {this.data} mutation (see SortableTableV1)
+  render() {
+    this.showLoader();
+    return this.loadNextData()
+      .then(this.updateView.bind(this))
+      .then(this.hideLoader.bind(this));
   }
 
-  loadNextData = throttle(() => {
+  loadNextData() {
     return this.pageFetcher.next()
-      .then(data => this.data = this.data.concat(data));
-  }, 500)
+            .then(data => this.data = this.data.concat(data));
+  }
+
+  showLoader() {
+    this.element.classList.add('sortable-table_loading');
+  }
+
+  updateView() {
+    this.data.length === 0 ? this.element.classList.add("sortable-table_empty") : this.element.classList.remove("sortable-table_empty");
+  }
+
+  hideLoader() {
+    this.element.classList.remove('sortable-table_loading');
+  }
 
   sort(id, order) {
     if (this.isSortLocally) {
@@ -62,77 +78,31 @@ export default class SortableTable extends SortableTableV2 {
 
   sortOnServer(id, order) {
     this.sorted = { id, order };
-    this.pageFetcher = new SortableTable.PageFetcher(this.url, BACKEND_URL, 30, this.sorted);
+    this.pageFetcher = new PageFetcher(this.url, BACKEND_URL, 30, this.sorted);
     this.pageFetcher.next()
       .then(data => this.data = data);
   }
 
-  static PageFetcher = class {
-    pageCounter = 0;
-    pageSize;
-    #hasNext = true;
-    sort;
-    url;
-
-    constructor(path, baseUrl, pageSize, sort) {
-      this.url = new URL(path, baseUrl);
-      this.pageSize = pageSize;
-      this.sort = sort;
-    }
-
-    hasNext() {
-      return this.#hasNext;
-    }
-
-    next() {
-      if (!this.#hasNext) return Promise.resolve([]);
-
-      const page = this.fetch();
-      return page
-              .then(page => {
-                if (page.length < this.pageSize) this.#hasNext = false;
-              })
-              .then(() => this.pageCounter++)
-              .then(() => page);
-    }
-
-    fetch() {
-      const url = new URL(this.url);
-      url.searchParams.set('_sort', this.sort.id);
-      url.searchParams.set('_order', this.sort.order);
-      url.searchParams.set('_start', this.pageCounter * this.pageSize);
-      url.searchParams.set('_end', this.pageCounter * this.pageSize + this.pageSize);
-      return fetchJson(url)
-    }
-  }
-}
-
-function throttle(func, ms) {
-
-  let isThrottled = false,
-    savedArgs,
-    savedThis;
-
-  function wrapper() {
-
-    if (isThrottled) {
-      savedArgs = arguments;
-      savedThis = this;
-      return;
-    }
-
-    func.apply(this, arguments);
-
-    isThrottled = true;
-
-    setTimeout(function() {
-      isThrottled = false;
-      if (savedArgs) {
-        wrapper.apply(savedThis, savedArgs);
-        savedArgs = savedThis = null;
-      }
-    }, ms);
+  createTemplate(headerConfig, data, sorted) {
+    return `
+      <div class="sortable-table">
+        ${this.createHeaderTemplate(headerConfig, sorted)}
+        ${this.createBodyTemplate(data)}
+        ${this.createLoaderTemplate()}
+        ${this.createEmptyPlaceHolderTemplate()}
+      </div>
+    `;
   }
 
-  return wrapper;
+  createLoaderTemplate() {
+    return `
+      <div data-elem="loading" class="loading-line sortable-table__loading-line"></div>
+    `;
+  }
+
+  createEmptyPlaceHolderTemplate() {
+    return `
+      <div data-elem="emptyPlaceholder" class="sortable-table__empty-placeholder"><div>Нет данных</div></div>
+    `;
+  }
 }
