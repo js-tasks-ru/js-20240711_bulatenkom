@@ -36,7 +36,7 @@ export default class ColumnChart extends ColumnChartV1 {
         const fetchedData = this.fetchData(from, to);
 
         return fetchedData
-                .then(data => Object.entries(data).toSorted().map(([k, v]) => v))
+                .then(data => Object.entries(data).sort().map(([k, v]) => v))
                 .then(super.update.bind(this))
                 .then(() => this.selectSubElements())
                 .then(() => this.root.classList.remove('column-chart_loading'))
