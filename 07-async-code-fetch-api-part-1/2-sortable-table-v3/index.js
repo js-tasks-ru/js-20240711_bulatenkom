@@ -83,26 +83,4 @@ export default class SortableTable extends SortableTableV2 {
       .then(data => this.data = data);
   }
 
-  createTemplate(headerConfig, data, sorted) {
-    return `
-      <div class="sortable-table">
-        ${this.createHeaderTemplate(headerConfig, sorted)}
-        ${this.createBodyTemplate(data)}
-        ${this.createLoaderTemplate()}
-        ${this.createEmptyPlaceHolderTemplate()}
-      </div>
-    `;
-  }
-
-  createLoaderTemplate() {
-    return `
-      <div data-elem="loading" class="loading-line sortable-table__loading-line"></div>
-    `;
-  }
-
-  createEmptyPlaceHolderTemplate() {
-    return `
-      <div data-elem="emptyPlaceholder" class="sortable-table__empty-placeholder"><div>Нет данных</div></div>
-    `;
-  }
 }

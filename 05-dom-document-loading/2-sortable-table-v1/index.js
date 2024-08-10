@@ -47,6 +47,8 @@ export default class SortableTable {
       <div class="sortable-table">
         ${this.createHeaderTemplate(headerConfig, sorted)}
         ${this.createBodyTemplate(data)}
+        ${this.createLoaderTemplate()}
+        ${this.createEmptyPlaceHolderTemplate()}
       </div>
     `;
   }
@@ -99,6 +101,18 @@ export default class SortableTable {
       <a href="#" class="sortable-table__row">
         ${columnsTemplate}
       </a>
+    `;
+  }
+
+  createLoaderTemplate() {
+    return `
+      <div data-elem="loading" class="loading-line sortable-table__loading-line"></div>
+    `;
+  }
+
+  createEmptyPlaceHolderTemplate() {
+    return `
+      <div data-elem="emptyPlaceholder" class="sortable-table__empty-placeholder"><div>Нет данных</div></div>
     `;
   }
 
