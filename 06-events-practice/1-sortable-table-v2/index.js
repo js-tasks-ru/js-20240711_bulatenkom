@@ -5,19 +5,22 @@ export default class SortableTable extends SortableTableV1 {
 
   constructor(headersConfig = [], {
     data = [],
-    sorted = {}
+    sorted
   } = {}) {
     super(headersConfig, data);
-    this.sort(sorted.id, sorted.order);
+    if (sorted) {
+      this.sort(sorted.id, sorted.order)
+    };
 
     this.addEventListener(this.subElements['header'], 'pointerdown', this.onHeaderPointerDown);
   }
 
   onHeaderPointerDown(event) {
     const sortableElement = event.target.closest('[data-sortable=true]')
+
     if (sortableElement) {
-      const order = sortableElement.dataset.order === 'asc' ? 'desc' : 'asc';
       const id = sortableElement.dataset.id;
+      const order = (sortableElement.dataset.order === 'asc') ? 'desc' : 'asc';
       const arrowElement = this.subElements['arrow'];
       this.sort(id, order);
       sortableElement.append(arrowElement);

@@ -18,7 +18,7 @@ export default class SortableTable {
 
   set data(value) {
     this.#data = value;
-    this.render();
+    this.#render();
   }
 
   get sorted() {
@@ -27,10 +27,10 @@ export default class SortableTable {
 
   set sorted({ id, order }) {
     this.#sorted = { id, order };
-    this.render();
+    this.#render();
   }
 
-  render() {
+  #render() {
     this.subElements['header'].innerHTML = this.createHeaderColumnsTemplate(this.headerConfig, this.sorted);
     this.subElements['body'].innerHTML = this.createBodyRowsTemplate(this.data);
     this.selectSubElements();
@@ -47,6 +47,8 @@ export default class SortableTable {
       <div class="sortable-table">
         ${this.createHeaderTemplate(headerConfig, sorted)}
         ${this.createBodyTemplate(data)}
+        ${this.createLoaderTemplate()}
+        ${this.createEmptyPlaceHolderTemplate()}
       </div>
     `;
   }
@@ -92,13 +94,25 @@ export default class SortableTable {
 
   createRowTemplate(item) {
     const columnsTemplate = this.headerConfig
-      .map(header => (header.template) ? header.template(item) : `<div class="sortable-table__cell">${item[header.id]}</div>`)
+      .map(header => (header.template) ? header.template(item[header.id]) : `<div class="sortable-table__cell">${item[header.id]}</div>`)
       .join('');
 
     return `
       <a href="#" class="sortable-table__row">
         ${columnsTemplate}
       </a>
+    `;
+  }
+
+  createLoaderTemplate() {
+    return `
+      <div data-elem="loading" class="loading-line sortable-table__loading-line"></div>
+    `;
+  }
+
+  createEmptyPlaceHolderTemplate() {
+    return `
+      <div data-elem="emptyPlaceholder" class="sortable-table__empty-placeholder"><div>Нет данных</div></div>
     `;
   }
 
